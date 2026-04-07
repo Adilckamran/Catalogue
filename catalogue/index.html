@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Real Flip Book</title>
+<style>
+body{margin:0;font-family:Arial;background:#f4f4f4}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  padding:40px;
+}
+
+.card{height:260px;cursor:pointer}
+.card img{
+  width:100%;height:100%;object-fit:cover;
+  border-radius:10px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.viewer{
+  position:fixed;
+  top:0;left:0;
+  width:100vw;height:100vh;
+  background:#000000ee;
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.book{
+  width:90vw;
+  height:85vh;
+  position:relative;
+  perspective:1500px;
+}
+
+.page{
+  width:50%;
+  height:100%;
+  position:absolute;
+  right:0;
+  top:0;
+  transform-origin:left;
+  transform-style:preserve-3d;
+  transition:transform 0.8s;
+}
+
+.page-content{
+  position:absolute;
+  width:100%;
+  height:100%;
+  backface-visibility:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  background:white;
+  padding:20px;
+  box-sizing:border-box;
+}
+
+.page-content.back{
+  transform:rotateY(180deg);
+}
+
+.page.flipped{
+  transform:rotateY(-180deg);
+}
+
+.left-fixed{
+  position:absolute;
+  left:0;
+  width:50%;
+  height:100%;
+  background:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.close{
+  position:absolute;
+  top:20px;right:30px;
+  font-size:24px;color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <div class="card" onclick="openBook(0)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(1)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(2)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(3)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(4)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(5)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(6)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(7)"><img src="https://via.placeholder.com/200x260"></div>
+  <div class="card" onclick="openBook(8)"><img src="https://via.placeholder.com/200x260"></div>
+</div>
+
+<div class="viewer" id="viewer">
+  <div class="close" onclick="closeBook()">✖</div>
+
+  <div class="book" id="book">
+    <div class="left-fixed" id="leftStatic"></div>
+
+    <div class="page" id="p1">
+      <div class="page-content" id="p1f"></div>
+      <div class="page-content back" id="p1b"></div>
+    </div>
+
+    <div class="page" id="p2" style="z-index:-1;">
+      <div class="page-content" id="p2f"></div>
+      <div class="page-content back" id="p2b"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+const books = [
+  ["Page1","Page2","Page3","Page4","Page5"],
+  ["B2-1","B2-2","B2-3","B2-4","B2-5"],
+  ["B3-1","B3-2","B3-3","B3-4","B3-5"],
+  ["B4-1","B4-2","B4-3","B4-4","B4-5"],
+  ["B5-1","B5-2","B5-3","B5-4","B5-5"],
+  ["B6-1","B6-2","B6-3","B6-4","B6-5"],
+  ["B7-1","B7-2","B7-3","B7-4","B7-5"],
+  ["B8-1","B8-2","B8-3","B8-4","B8-5"],
+  ["B9-1","B9-2","B9-3","B9-4","B9-5"]
+];
+
+let currentBook = 0;
+let currentPage = 0;
+
+function loadBook(){
+  const b = books[currentBook];
+
+  document.getElementById('leftStatic').innerHTML = b[0] || "";
+  document.getElementById('p1f').innerHTML = b[1] || "";
+  document.getElementById('p1b').innerHTML = b[2] || "";
+  document.getElementById('p2f').innerHTML = b[3] || "";
+  document.getElementById('p2b').innerHTML = b[4] || "";
+
+  document.getElementById('p1').classList.remove('flipped');
+  document.getElementById('p2').classList.remove('flipped');
+  currentPage = 0;
+}
+
+function openBook(i){
+  currentBook = i;
+  document.getElementById('viewer').style.display='flex';
+  loadBook();
+}
+
+function closeBook(){
+  document.getElementById('viewer').style.display='none';
+}
+
+// CLICK FLIP
+document.getElementById('book').addEventListener('click', function(e){
+  const rect = this.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+
+  if(x > rect.width/2){
+    if(currentPage === 0){
+      document.getElementById('p1').classList.add('flipped');
+      currentPage = 1;
+    } else if(currentPage === 1){
+      document.getElementById('p2').classList.add('flipped');
+      currentPage = 2;
+    }
+  } else {
+    if(currentPage === 2){
+      document.getElementById('p2').classList.remove('flipped');
+      currentPage = 1;
+    } else if(currentPage === 1){
+      document.getElementById('p1').classList.remove('flipped');
+      currentPage = 0;
+    }
+  }
+});
+
+</script>
+</body>
+</html>
